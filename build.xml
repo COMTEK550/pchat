@@ -1,0 +1,52 @@
+<project name="Picochat" default="dist" basedir=".">
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="dist" location="dist"/>
+
+    <target name="init">
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}/shared"/>
+        <mkdir dir="${build}/server"/>
+        <mkdir dir="${build}/client"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!-- Compile the Java code from ${src} into ${build} -->
+        <javac destdir="${build}/server">
+            <src path="${src}/server"/>
+            <src path="${src}/shared"/>
+        </javac>
+        <javac destdir="${build}/client">
+            <src path="${src}/client"/>
+            <src path="${src}/shared"/>
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar basedir="${build}/client" jarfile="${dist}/client.jar">
+            <manifest>
+                <attribute name="Main-Class" value="Main"/>
+            </manifest>
+        </jar>
+        <jar basedir="${build}/server" jarfile="${dist}/server.jar">
+            <manifest>
+                <attribute name="Main-Class" value="Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run-server" depends="dist">
+        <java jar="${dist}/server.jar" fork="true"/>
+    </target>
+    <target name="run-client" depends="dist">
+        <java jar="${dist}/client.jar" fork="true"/>
+    </target>
+
+    <target name="clean"
+      description="clean up">
+      <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+</project>
