@@ -10,9 +10,10 @@ public class Main {
 
         int portNumber = Integer.parseInt(args[0]);
 
-        Listener listener = new Listener(portNumber);
+        Store store = new Store("", "");
+        Listener listener = new Listener(portNumber, store);
         try {
-            Store store = new Store("julian", "hejmeddig");
+            System.out.println("Listening");
             listener.listen();
         } catch(Exception e) {
             System.out.printf("Fejl: %s%n", e);

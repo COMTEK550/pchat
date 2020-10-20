@@ -14,23 +14,27 @@ public class Main {
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
 
+        TextMessage msg = new TextMessage("Hej med dig hvordan", 0);
 
-        try (
+        try {
                 Socket echoSocket = new Socket(hostName, portNumber);
 
                 ObjectOutputStream out = new ObjectOutputStream(echoSocket.getOutputStream());
 
-        ) {
-            out.writeObject(new TextMessage("Hej med dig fra client"));
-            out.writeObject(new TextMessage("Besked 2"));
-            out.close();
-            echoSocket.close();
+
+            out.writeObject(msg);
+
+            ObjectInputStream in = new ObjectInputStream(echoSocket.getInputStream());
+
+            while(true) {
+                Message m = (Message) in.readObject();
+                System.out.println(m);
+            }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " +
-                    hostName);
+        } catch (Exception e) {
+            System.err.printf("fejl: %s%n", e);
             System.exit(1);
         }
     }
