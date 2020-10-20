@@ -42,6 +42,10 @@
     <target name="run-client" depends="dist">
         <java jar="${dist}/client.jar" fork="true"/>
     </target>
+    <target name="run-chat" depends="dist">
+        <java jar="${dist}/client.jar" fork="true"/>
+        <java jar="${dist}/server.jar" fork="true"/>
+    </target>
 
     <target name="clean"
       description="clean up">
