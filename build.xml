@@ -30,8 +30,10 @@
             </manifest>
         </jar>
         <jar basedir="${build}/server" jarfile="${dist}/server.jar">
+            <zipgroupfileset dir="lib" includes="postgresql.jar" />
             <manifest>
                 <attribute name="Main-Class" value="Main"/>
+                <attribute name="DependencyFinder" value="main"/>
             </manifest>
         </jar>
     </target>
