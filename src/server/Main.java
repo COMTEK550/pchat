@@ -12,8 +12,9 @@ public class Main {
 
         Listener listener = new Listener(portNumber);
         try {
+            Store store = new Store("julian", "hejmeddig");
             listener.listen();
-        } catch(IOException e) {
+        } catch(Exception e) {
             System.out.printf("Fejl: %s%n", e);
         }
     }
