@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 
+import javax.swing.JFileChooser;
+
 /**
  *
  * @author vdot0x23
@@ -28,11 +30,14 @@ public class UsernameForm extends javax.swing.JFrame {
 
         UsernameForm = new javax.swing.JOptionPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        String desiredUsername = javax.swing.JOptionPane.showInputDialog("Username:");
+				if (desiredUsername != null) {
+					System.out.print(desiredUsername);
+					JFileChooser chooser = new JFileChooser();
+					chooser.setDialogTitle("Open Public Key");
+					int returnVal = chooser.showOpenDialog(getParent());
+				}
 
-        UsernameForm.setMessage("Username");
-
-        UsernameForm.setWantsInput(true);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
