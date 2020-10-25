@@ -166,7 +166,7 @@ public class rootGUI extends javax.swing.JFrame {
                 /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UsernameForm().setVisible(true);
+                new ConnectForm().setVisible(true);
             }
         });
         
