@@ -1,0 +1,7 @@
+<ivy-module version="2.0">
+	<info organisation="comtek550" module="pchat-test"/>
+	<dependencies>
+		<dependency org="org.assertj" name="assertj-swing-parent-pom" rev="3.17.1" />
+		<dependency org="junit" name="junit" rev="4.13.1" />
+	</dependencies>
+</ivy-module>

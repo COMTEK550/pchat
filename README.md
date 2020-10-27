@@ -3,6 +3,8 @@ Java project
 
 # To Run
 
-Server: java -jar dist/server.jar 8080
+- Install [Apache Ant ^tm](https://ant.apache.org/)
 
-Client: java -jar dist/client.jar localhost 8080
+- `ant run-client` and/or `ant run-server`
+
+[Apache Ivy ^tm](https://ant.apache.org/ivy/) will clutter `~/.ant`, so remove that after your work is done if you don't want it.
