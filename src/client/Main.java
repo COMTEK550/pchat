@@ -1,9 +1,15 @@
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -24,19 +30,23 @@ public class Main {
 }
 class Client {
     private HashMap<Integer,String[]> conversations = new HashMap<>();
+    private String pkey;
     public void connect(String hostName, int portNumber) {
         ObjectOutputStream out;
         try{
         Socket echoSocket = new Socket(hostName, portNumber);
 
         //KUN TIL TEST
-        System.out.println("give key");
+
         BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
-        String keyStr = obj.readLine();
+
+
+        generate_keys();
+
         System.out.println("give username");
 
         String user = obj.readLine();
-        RegisterMessage rmsg = new RegisterMessage(keyStr, user);
+        RegisterMessage rmsg = new RegisterMessage(this.pkey, user);
 
         //START INPUT
         MessageRecieved msgRecieved = new MessageRecieved(echoSocket, this);
@@ -86,9 +96,24 @@ class Client {
         System.exit(1);
     }
     }
+    private void generate_keys(){
+        GenerateKeys gk;
+        try {
+            gk = new GenerateKeys(1024);
+            gk.createKeys();
+            gk.writeToFile("KeyPair/publicKey", gk.getPublicKey().getEncoded());
+            gk.writeToFile("KeyPair/privateKey", gk.getPrivateKey().getEncoded());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
 
-    public void sent_text(String msg, ObjectOutputStream out,int conv_id){
-        TextMessage message = new TextMessage(msg,conv_id);
+    public void sent_text(String msg, ObjectOutputStream out,int conv_id) throws Exception {
+        String secret = "hejmeddig";
+        Encryption encryption = new Encryption();
+        String encrypted_message = encryption.encryptText(secret,encryption.getPrivate("KeyPair/privateKey"));
+
+        TextMessage message = new TextMessage(encrypted_message,conv_id);
         try {
             out.writeObject(message);
         } catch (IOException e) {
