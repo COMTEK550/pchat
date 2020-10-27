@@ -1,13 +1,14 @@
 import org.junit.Test;
-import org.junit.Assert.assertEquals;
+import org.junit.Assert;
+import junit.framework.TestCase;
 
-public class TestChatForm extends org.junit.TestCase {
+public class TestChatForm extends TestCase {
   protected int value1, value2;
 
   @Test
   public void testTests() {
     String lol = "hej";
     System.out.println(lol);
-    assertEquals(lol, lol);
+    Assert.assertEquals(lol, lol);
   }
 }
