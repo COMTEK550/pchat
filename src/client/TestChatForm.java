@@ -9,6 +9,6 @@ public class TestChatForm extends TestCase {
   public void testTests() {
     String lol = "hej";
     System.out.println(lol);
-    Assert.assertEquals(lol, lol);
+    Assert.assertEquals(1, 1);
   }
 }

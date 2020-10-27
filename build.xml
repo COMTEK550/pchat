@@ -5,7 +5,7 @@
     <property name="dist" location="dist"/>
     <property name="ivy.install.version" value="2.5.0"/>
     <condition property="ivy.home" value="${env.IVY_HOME}">
-      <isset property="env.IVY_HOME"/>
+        <isset property="env.IVY_HOME"/>
     </condition>
     <property name="ivy.home" value="${user.home}/.ant"/>
     <property name="ivy.jar.dir" value="${ivy.home}/lib"/>
@@ -14,28 +14,28 @@
     <property name="port" value="6969"/>
 
     <path id="classpath.test">
-      <fileset dir="lib">
-        <include name="*"/>
-      </fileset>
+        <fileset dir="lib">
+            <include name="*"/>
+        </fileset>
     </path>
 
     <target name="download-ivy" unless="offline">
-      <mkdir dir="${ivy.jar.dir}"/>
-        <!-- download Ivy from web site so that it can be used even without any special installation -->
-      <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
-        dest="${ivy.jar.file}" usetimestamp="true"/>
+        <mkdir dir="${ivy.jar.dir}"/>
+            <!-- download Ivy from web site so that it can be used even without any special installation -->
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+            dest="${ivy.jar.file}" usetimestamp="true"/>
     </target>
 
     <target name="init-ivy" depends="download-ivy">
-      <!-- try to load Ivy here from Ivy home, in case the user has not already dropped
-        it into Ant's lib dir (note that the latter copy will always take precedence).
-        We will not fail as long as local lib dir exists (it may be empty) and
-      Ivy is in at least one of Ant's lib dir or the local lib dir. -->
-      <path id="ivy.lib.path">
-        <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-      </path>
-      <taskdef resource="org/apache/ivy/ant/antlib.xml"
-        uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+        <!-- try to load Ivy here from Ivy home, in case the user has not already dropped
+            it into Ant's lib dir (note that the latter copy will always take precedence).
+            We will not fail as long as local lib dir exists (it may be empty) and
+        Ivy is in at least one of Ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+            uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
     </target>
 
     <target name="libs" depends="init-ivy" description="--> retrieve dependencies with Ivy">
@@ -90,34 +90,35 @@
     </target>
 
     <target name="run-server" depends="dist">
-      <java jar="${dist}/server.jar" fork="true">
-        <arg value="${port}"/>
-      </java>
+        <java jar="${dist}/server.jar" fork="true">
+            <arg value="${port}"/>
+        </java>
     </target>
 
     <target name="run-client" depends="dist">
-      <java jar="${dist}/client.jar" fork="true">
-        <arg value="${address}"/>
-        <arg value="${port}"/>
-      </java>
+        <java jar="${dist}/client.jar" fork="true">
+            <arg value="${address}"/>
+            <arg value="${port}"/>
+        </java>
     </target>
 
-    <target name="test" depends="compile-tests">
-      <junit>
-        <classpath refid = "classpath.test"/>
-        <batchtest>
-          <fileset dir="${build}">
-            <include name="**/Test*"/>
-          </fileset>
-        </batchtest>
-        <formatter type="plain" usefile="false"/>
-      </junit>
+    <target name="test-client" depends="compile-tests">
+        <junit>
+            <classpath location="${build}/client"/>
+            <classpath refid = "classpath.test"/>
+            <batchtest>
+                <fileset dir="${build}/client">
+                    <include name="**/Test*"/>
+                </fileset>
+            </batchtest>
+            <formatter type="plain" usefile="false"/>
+        </junit>
     </target>
 
     <target name="clean"
-      description="clean up">
-      <!-- Delete the ${build} and ${dist} directory trees -->
-        <delete dir="${build}"/>
-        <delete dir="${dist}"/>
-    </target>
+        description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+</target>
 </project>
