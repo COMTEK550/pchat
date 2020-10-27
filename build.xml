@@ -80,7 +80,7 @@
       <java jar="${dist}/client.jar" fork="true">
         <arg value="${address}"/>
         <arg value="${port}"/>
-			</java>
+      </java>
     </target>
 
     <target name="clean"
