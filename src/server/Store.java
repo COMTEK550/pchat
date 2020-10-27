@@ -4,18 +4,28 @@ import java.sql.DriverManager;
 import java.util.ArrayList;
 
 public class Store {
-    private Connection sql;
     private ArrayList<Conversation> conversations;
-
-    public Store(String username, String password) {
-        //sql = DriverManager.getConnection("jdbc:postgresql://localhost:5432/pchatdb", username, password);
+    private ArrayList<User> users;
+    public Store(String username, String pkey) {
 
         this.conversations = new ArrayList<>();
-
-        ArrayList<User> test_users = new ArrayList<>();
-        test_users.add(new User("nicholas"));
-        this.conversations.add(new Conversation(test_users));
+        this.users = new ArrayList<>();
     }
+    public boolean check(String pkey){
+       return users.contains(pkey);
+    }
+    public void add_user(User user){
+        this.users.add(user);
+    }
+    public void remove_user(User user){
+        this.users.remove(user);
+    }
+ 
+
+    public void add_to_conversation(User user, Conversation conv){
+
+    }
+
 
     public Conversation get_conversation(int id) {
         return this.conversations.get(id);

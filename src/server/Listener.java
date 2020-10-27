@@ -30,7 +30,7 @@ public class Listener {
     }
 
     public void unregister_client(User user) {
-        this.sockets.remove(user.name);
+        this.sockets.remove(user);
     }
 
     public boolean send_to_user(Message msg, User to) throws IOException {
@@ -43,13 +43,20 @@ public class Listener {
         return true;
     }
 
-    public void handle_msg(Message msg, User from) throws IOException {
-        System.out.printf("Got message from %s: %s%n", from.name, msg);
+    public void handle_msg(Message msg, SocketHandler sock) throws IOException {
         if (msg.getClass() == TextMessage.class) {
             // Text message, redirect to conversation
             TextMessage tmsg = (TextMessage) msg;
             Conversation conv = this.store.get_conversation(tmsg.conversation);
             conv.send_here(this, tmsg);
+        }
+        else if(msg.getClass() == RegisterMessage.class){
+
+            RegisterMessage rmsg = (RegisterMessage) msg;
+            System.out.printf("Got public key from %s: %s%n", rmsg.name, rmsg.key);
+
+            sock.me = register_client(sock,rmsg.name);
+
         }
     }
 
@@ -58,7 +65,7 @@ public class Listener {
 class SocketHandler extends Thread {
     private Socket conn;
     private Listener listener;
-    private User me;
+    public User me;
 
     public SocketHandler(Socket conn, Listener listener) {
         this.conn = conn;
@@ -66,7 +73,6 @@ class SocketHandler extends Thread {
     }
 
     public void run() {
-        this.me = this.listener.register_client(this, "nicholas");
         try (
             ObjectInputStream in = new ObjectInputStream(this.conn.getInputStream());
         ) {
@@ -75,7 +81,7 @@ class SocketHandler extends Thread {
 
                 Message m = (Message) in.readObject();
                 System.out.println("client message");
-                this.listener.handle_msg(m, this.me);
+                this.listener.handle_msg(m, this);
             }
         } catch (EOFException e) {
             // Client disconnected do nothing
