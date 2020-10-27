@@ -33,8 +33,8 @@ public class Listener {
         this.sockets.remove(user);
     }
 
-    public boolean send_to_user(Message msg, User to) throws IOException {
-        SocketHandler h = this.sockets.get(to.name);
+    public boolean send_to_user(Message msg, String to) throws IOException {
+        SocketHandler h = this.sockets.get(to);
         if (h == null) {
             return false;
         }
@@ -43,7 +43,7 @@ public class Listener {
         return true;
     }
 
-    public void handle_msg(Message msg, SocketHandler sock) throws IOException {
+    public void handle_msg(Message msg, SocketHandler sock) throws Exception {
         if (msg.getClass() == TextMessage.class) {
             // Text message, redirect to conversation
             TextMessage tmsg = (TextMessage) msg;
@@ -57,6 +57,15 @@ public class Listener {
 
             sock.me = register_client(sock,rmsg.name);
 
+        } else if(msg.getClass() == ConversationMessage.class) {
+            ConversationMessage cmsg = (ConversationMessage) msg;
+
+            cmsg.id = this.store.register_conversation(cmsg);
+            System.out.printf("Created conversation with id %d%n", cmsg.id);
+
+            for (String user : cmsg.users) {
+                this.send_to_user(cmsg, user);
+            }
         }
     }
 
