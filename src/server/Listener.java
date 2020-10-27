@@ -104,6 +104,7 @@ class SocketHandler extends Thread implements MessageSender {
                     this.listener.handle_msg(m, this);
                 } catch (ClientException e) {
                     System.out.printf("Client ERR: %s%n", e);
+                    this.send(e.to_msg());
                 }
             }
         } catch (EOFException e) {

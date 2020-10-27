@@ -130,11 +130,14 @@ class Client {
         if(msg.getClass()==TextMessage.class){
             TextMessage tmsg = (TextMessage) msg;
             System.out.printf("On %d: %s\n", tmsg.conversation, tmsg.toString());
-        }if(msg.getClass()==ConversationMessage.class){
+        } else if(msg.getClass()==ConversationMessage.class){
             ConversationMessage cmsg = (ConversationMessage) msg;
 
             this.conversations.put(cmsg.id, cmsg.users);
             System.out.printf("Joined conversation %d with %s%n", cmsg.id, Arrays.toString(cmsg.users));
+        } else if(msg.getClass() == ErrorMessage.class) {
+            ErrorMessage emsg = (ErrorMessage) msg;
+            System.out.printf("Server err: %s%n", emsg);
         }
 
     }
