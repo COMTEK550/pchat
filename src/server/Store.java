@@ -29,6 +29,7 @@ public class Store {
         return u;
     }
     public void add_user(User user){
+        System.out.printf("Added user %s%n", user.name);
         this.users.put(user.name, user);
     }
     public void remove_user(User user){
@@ -46,7 +47,7 @@ public class Store {
     public int register_conversation(ConversationMessage cmsg) throws Exception {
         // Check if users exist
         for (String user : cmsg.users) {
-            if (this.check(user)) {
+            if (!this.check(user)) {
                 throw new NoSuchUserException(user);
             }
         }
@@ -56,16 +57,16 @@ public class Store {
         return conversations.size() - 1;
     }
 
-    public void write_conv_for_user(ObjectOutputStream out, User user) throws IOException {
+    public void replay_all_for_user(MessageSender out, User user) throws IOException {
         // Not efficient, should probably have a map with users and conversations
         for (int i = 0; i < this.conversations.size(); i++) {
             Conversation conv = this.conversations.get(i);
             if (conv.has_user(user.name)) {
                 ConversationMessage cmsg = new ConversationMessage(conv.get_users());
                 cmsg.id = i;
-                out.writeObject(cmsg);
+                out.send(cmsg);
 
-                conv.write_messages(out);
+                conv.replay(out);
             }
         }
     }

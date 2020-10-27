@@ -24,9 +24,8 @@ public class Listener {
         }
     }
 
-    public User register_client(SocketHandler h, String username,String pkey) {
+    public void register_client(SocketHandler h, String username) {
         this.sockets.put(username, h);
-        return new User(username,pkey);
     }
 
     public void unregister_client(User user) {
@@ -53,10 +52,18 @@ public class Listener {
         else if(msg.getClass() == RegisterMessage.class){
             RegisterMessage rmsg = (RegisterMessage) msg;
             System.out.printf("Got public key from %s: %s%n", rmsg.name, rmsg.key);
-            if(!this.store.check(rmsg.name)) {
-                sock.me = register_client(sock, rmsg.name, rmsg.key);
-                this.store.add_user(sock.me);
+            User u;
+
+            if(this.store.check(rmsg.name)) {
+                u = this.store.get_user(rmsg.name);
+
+                this.store.replay_all_for_user(sock, u);
+            } else {
+                u = new User(rmsg.name, rmsg.key);
+                this.store.add_user(u);
             }
+            register_client(sock, u.name);
+
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
 
@@ -71,7 +78,7 @@ public class Listener {
     }
 }
 
-class SocketHandler extends Thread {
+class SocketHandler extends Thread implements MessageSender {
     private Socket conn;
     private Listener listener;
     public User me;
@@ -101,11 +108,15 @@ class SocketHandler extends Thread {
             System.out.println("Client disconnected");
             this.listener.unregister_client(this.me);
         } catch (Exception e) {
-            System.out.printf("Fejl fra client: %s%n", e);
+            System.out.printf("ERR: %s%n", e);
+            e.printStackTrace();
         }
     }
 
     public void send(Message msg) throws IOException {
+        if (this.me != null) {
+            System.out.printf("Sending message to %s%n", this.me.name);
+        }
 
         this.out.writeObject(msg);
     }
