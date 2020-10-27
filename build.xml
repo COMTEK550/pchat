@@ -83,6 +83,20 @@
       </java>
     </target>
 
+    <target name="test" depends="compile">
+      <junit>
+        <classpath>
+          <fileset dir="lib/"/>
+        </classpath>
+        <batchtest>
+          <fileset dir="${build}">
+            <include name="**/Test*"/>
+          </fileset>
+        </batchtest>
+        <formatter type="plain" usefile="false"/>
+      </junit>
+    </target>
+
     <target name="clean"
       description="clean up">
       <!-- Delete the ${build} and ${dist} directory trees -->
