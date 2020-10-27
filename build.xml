@@ -13,6 +13,12 @@
     <property name="address" value="localhost"/>
     <property name="port" value="6969"/>
 
+    <path id="classpath.test">
+      <fileset dir="lib">
+        <include name="*"/>
+      </fileset>
+    </path>
+
     <target name="download-ivy" unless="offline">
       <mkdir dir="${ivy.jar.dir}"/>
         <!-- download Ivy from web site so that it can be used even without any special installation -->
@@ -55,6 +61,20 @@
         </javac>
     </target>
 
+    <target name="compile-tests" depends="init">
+        <!-- Compile the Java code from ${src} into ${build} -->
+        <javac destdir="${build}/server">
+            <classpath refid="classpath.test"/>
+            <src path="${src}/server"/>
+            <src path="${src}/shared"/>
+        </javac>
+        <javac destdir="${build}/client">
+            <classpath refid="classpath.test"/>
+            <src path="${src}/client"/>
+            <src path="${src}/shared"/>
+        </javac>
+    </target>
+
     <target name="dist" depends="compile">
         <jar basedir="${build}/client" jarfile="${dist}/client.jar">
             <manifest>
@@ -62,7 +82,6 @@
             </manifest>
         </jar>
         <jar basedir="${build}/server" jarfile="${dist}/server.jar">
-            <zipgroupfileset dir="lib" includes="postgresql.jar" />
             <manifest>
                 <attribute name="Main-Class" value="Main"/>
                 <attribute name="DependencyFinder" value="main"/>
@@ -83,11 +102,9 @@
       </java>
     </target>
 
-    <target name="test" depends="compile">
+    <target name="test" depends="compile-tests">
       <junit>
-        <classpath>
-          <fileset dir="lib/"/>
-        </classpath>
+        <classpath refid = "classpath.test"/>
         <batchtest>
           <fileset dir="${build}">
             <include name="**/Test*"/>
