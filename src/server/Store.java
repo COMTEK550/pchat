@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -42,14 +44,30 @@ public class Store {
     }
 
     public int register_conversation(ConversationMessage cmsg) throws Exception {
-        User[] users = new User[cmsg.users.length];
-        for (int i = 0; i < cmsg.users.length; i++) {
-            users[i] = this.get_user(cmsg.users[i]);
+        // Check if users exist
+        for (String user : cmsg.users) {
+            if (this.check(user)) {
+                throw new NoSuchUserException(user);
+            }
         }
 
-        Conversation conv = new Conversation(users);
+        Conversation conv = new Conversation(cmsg.users);
         conversations.add(conv);
         return conversations.size() - 1;
+    }
+
+    public void write_conv_for_user(ObjectOutputStream out, User user) throws IOException {
+        // Not efficient, should probably have a map with users and conversations
+        for (int i = 0; i < this.conversations.size(); i++) {
+            Conversation conv = this.conversations.get(i);
+            if (conv.has_user(user.name)) {
+                ConversationMessage cmsg = new ConversationMessage(conv.get_users());
+                cmsg.id = i;
+                out.writeObject(cmsg);
+
+                conv.write_messages(out);
+            }
+        }
     }
 }
 
