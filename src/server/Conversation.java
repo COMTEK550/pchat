@@ -11,7 +11,7 @@ public class Conversation {
     }
 
     public void send_here(Listener listener, TextMessage msg) throws IOException {
-        System.out.printf("Sending message to conversation: %s%n", msg);
+        System.out.printf("Sending message to conversation: %s%n", msg.conversation);
         msgs.add(msg);
 
         for (User user : this.users) {

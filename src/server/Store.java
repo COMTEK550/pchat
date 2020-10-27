@@ -6,14 +6,16 @@ import java.util.HashMap;
 
 public class Store {
     private ArrayList<Conversation> conversations;
+
     private HashMap<String, User> users;
-    public Store(String username, String pkey) {
+
+    public Store() {
 
         this.conversations = new ArrayList<>();
         this.users = new HashMap<>();
     }
-    public boolean check(String pkey){
-       return users.containsValue(pkey);
+    public boolean check(String name){
+       return users.containsKey(name);
     }
 
     public User get_user(String name) throws NoSuchUserException {

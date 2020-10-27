@@ -24,9 +24,9 @@ public class Listener {
         }
     }
 
-    public User register_client(SocketHandler h, String username) {
+    public User register_client(SocketHandler h, String username,String pkey) {
         this.sockets.put(username, h);
-        return new User(username);
+        return new User(username,pkey);
     }
 
     public void unregister_client(User user) {
@@ -51,12 +51,12 @@ public class Listener {
             conv.send_here(this, tmsg);
         }
         else if(msg.getClass() == RegisterMessage.class){
-
             RegisterMessage rmsg = (RegisterMessage) msg;
             System.out.printf("Got public key from %s: %s%n", rmsg.name, rmsg.key);
-
-            sock.me = register_client(sock,rmsg.name);
-
+            if(!this.store.check(rmsg.name)) {
+                sock.me = register_client(sock, rmsg.name, rmsg.key);
+                this.store.add_user(sock.me);
+            }
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
 
@@ -65,26 +65,30 @@ public class Listener {
 
             for (String user : cmsg.users) {
                 this.send_to_user(cmsg, user);
+
             }
         }
     }
-
 }
 
 class SocketHandler extends Thread {
     private Socket conn;
     private Listener listener;
     public User me;
+    private ObjectOutputStream out;
 
     public SocketHandler(Socket conn, Listener listener) {
         this.conn = conn;
         this.listener = listener;
+
     }
 
     public void run() {
         try (
-            ObjectInputStream in = new ObjectInputStream(this.conn.getInputStream());
+        ObjectInputStream in = new ObjectInputStream(this.conn.getInputStream());
         ) {
+            this.out = new ObjectOutputStream(this.conn.getOutputStream());
+
             System.out.println("got a client");
             while (true) {
 
@@ -102,7 +106,7 @@ class SocketHandler extends Thread {
     }
 
     public void send(Message msg) throws IOException {
-        ObjectOutputStream out = new ObjectOutputStream(this.conn.getOutputStream());
-        out.writeObject(msg);
+
+        this.out.writeObject(msg);
     }
 }

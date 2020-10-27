@@ -10,7 +10,7 @@ public class Main {
 
         int portNumber = Integer.parseInt(args[0]);
 
-        Store store = new Store("", "");
+        Store store = new Store();
         Listener listener = new Listener(portNumber, store);
         try {
             System.out.println("Listening");

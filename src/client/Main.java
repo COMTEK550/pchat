@@ -1,6 +1,9 @@
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,9 +23,9 @@ public class Main {
 
 }
 class Client {
-
+    private HashMap<Integer,String[]> conversations = new HashMap<>();
     public void connect(String hostName, int portNumber) {
-        ObjectOutput out;
+        ObjectOutputStream out;
         try{
         Socket echoSocket = new Socket(hostName, portNumber);
 
@@ -45,7 +48,28 @@ class Client {
 
         while(true){
             String message = obj.readLine();
-            sent_text(message,out);
+            if(message.startsWith("-startc")){
+                String members = message.split(" ")[1];
+                String[] member_split = members.split(",");
+                ConversationMessage cmsg = new ConversationMessage(member_split);
+                out.writeObject(cmsg);
+            }
+             else if(message.startsWith("-listc")){
+                 for(int i=0;i<this.conversations.size();i++){
+                     System.out.println(Arrays.toString(this.conversations.get(i)));
+                 }
+
+            }else {
+                int conv_id;
+                try {
+                    String[] message_split = message.split("_");
+                    conv_id = Integer.parseInt(message_split[1]);
+                    sent_text(message_split[0], out, conv_id);
+
+                } catch (Exception e) {
+                    System.out.printf("Forkert conversation id: %s %n",e);
+                }
+            }
         }
 
     } catch(
@@ -63,8 +87,8 @@ class Client {
     }
     }
 
-    public void sent_text(String msg, ObjectOutput out){
-        TextMessage message = new TextMessage(msg,0);
+    public void sent_text(String msg, ObjectOutputStream out,int conv_id){
+        TextMessage message = new TextMessage(msg,conv_id);
         try {
             out.writeObject(message);
         } catch (IOException e) {
@@ -78,6 +102,11 @@ class Client {
         if(msg.getClass()==TextMessage.class){
             TextMessage tmsg = (TextMessage) msg;
             System.out.println(tmsg.toString());
+        }if(msg.getClass()==ConversationMessage.class){
+            ConversationMessage cmsg = (ConversationMessage) msg;
+
+            this.conversations.put(cmsg.id, cmsg.users);
+            System.out.println(cmsg.users);
         }
 
     }
@@ -102,7 +131,9 @@ class MessageRecieved extends Thread {
         try {
             ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
             while(true) {
+
                 Message msg = (Message) in.readObject();
+                System.out.println("GOT MESSAGE!!!");
                 client.handle_msg(msg);
 
             }
