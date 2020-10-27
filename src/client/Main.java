@@ -30,6 +30,7 @@ public class Main {
 }
 class Client {
     private HashMap<Integer,String[]> conversations = new HashMap<>();
+    private int selected;
     private String pkey;
     public void connect(String hostName, int portNumber) {
         ObjectOutputStream out;
@@ -69,32 +70,34 @@ class Client {
                      System.out.println(Arrays.toString(this.conversations.get(i)));
                  }
 
-            }else {
+            } else if(message.startsWith("-select")) {
+                String idstr = message.split(" ")[1];
+                this.selected = Integer.parseInt(idstr);
+
+            } else {
                 int conv_id;
                 try {
-                    String[] message_split = message.split("_");
-                    conv_id = Integer.parseInt(message_split[1]);
-                    sent_text(message_split[0], out, conv_id);
+                    sent_text(message, out, this.selected);
 
                 } catch (Exception e) {
                     System.out.printf("Forkert conversation id: %s %n",e);
                 }
+                }
             }
+
+        } catch(
+                UnknownHostException e)
+
+        {
+            System.err.println("Don't know about host " + hostName);
+            System.exit(1);
+        } catch(
+                Exception e)
+
+        {
+            System.err.printf("fejl: %s%n", e);
+            System.exit(1);
         }
-
-    } catch(
-        UnknownHostException e)
-
-    {
-        System.err.println("Don't know about host " + hostName);
-        System.exit(1);
-    } catch(
-    Exception e)
-
-    {
-        System.err.printf("fejl: %s%n", e);
-        System.exit(1);
-    }
     }
     private void generate_keys(){
         GenerateKeys gk;
@@ -126,12 +129,12 @@ class Client {
     public void handle_msg(Message msg){
         if(msg.getClass()==TextMessage.class){
             TextMessage tmsg = (TextMessage) msg;
-            System.out.println(tmsg.toString());
+            System.out.printf("On %d: %s\n", tmsg.conversation, tmsg.toString());
         }if(msg.getClass()==ConversationMessage.class){
             ConversationMessage cmsg = (ConversationMessage) msg;
 
             this.conversations.put(cmsg.id, cmsg.users);
-            System.out.println(cmsg.users);
+            System.out.printf("Joined conversation %d with %s%n", cmsg.id, Arrays.toString(cmsg.users));
         }
 
     }

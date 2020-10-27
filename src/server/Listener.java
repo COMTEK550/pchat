@@ -100,8 +100,11 @@ class SocketHandler extends Thread implements MessageSender {
             while (true) {
 
                 Message m = (Message) in.readObject();
-                System.out.println("client message");
-                this.listener.handle_msg(m, this);
+                try {
+                    this.listener.handle_msg(m, this);
+                } catch (ClientException e) {
+                    System.out.printf("Client ERR: %s%n", e);
+                }
             }
         } catch (EOFException e) {
             // Client disconnected do nothing

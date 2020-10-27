@@ -40,8 +40,12 @@ public class Store {
 
     }
 
-    public Conversation get_conversation(int id) {
-        return this.conversations.get(id);
+    public Conversation get_conversation(int id) throws NoSuchConversationException {
+        try {
+            return this.conversations.get(id);
+        } catch(IndexOutOfBoundsException e) {
+            throw new NoSuchConversationException(id);
+        }
     }
 
     public int register_conversation(ConversationMessage cmsg) throws Exception {
@@ -72,8 +76,15 @@ public class Store {
     }
 }
 
-class NoSuchUserException extends Exception {
+class NoSuchUserException extends ClientException {
     public NoSuchUserException(String user) {
         super(String.format("no such user: %s", user));
     }
+}
+
+class NoSuchConversationException extends ClientException {
+   public NoSuchConversationException(int id)  {
+       super(String.format("no such conversation: %d", id));
+   }
+
 }
