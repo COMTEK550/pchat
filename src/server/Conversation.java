@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 public class Conversation {
     private ArrayList<TextMessage> msgs;
-    private ArrayList<User> users;
+    private User[] users;
 
-    public Conversation(ArrayList<User> users) {
+    public Conversation(User[] users) {
         this.msgs = new ArrayList<>();
         this.users = users;
     }
@@ -16,7 +16,7 @@ public class Conversation {
 
         for (User user : this.users) {
             System.out.println("SENDING MESSAGE");
-            listener.send_to_user(msg, user);
+            listener.send_to_user(msg, user.name);
         }
     }
 }
