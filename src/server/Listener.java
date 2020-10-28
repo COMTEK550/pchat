@@ -65,11 +65,16 @@ public class Listener {
                 u = this.store.get_user(rmsg.name);
 
                 this.store.replay_all_for_user(sock, u);
+
             } else {
                 u = new User(rmsg.name, rmsg.key);
                 this.store.add_user(u);
+
             }
             register_client(sock, u.name);
+            for(User user : this.store.get_all_users().values()){
+                send_to_user(rmsg,user.name);
+            }
 
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;

@@ -20,6 +20,8 @@ public class Store {
        return users.containsKey(name);
     }
 
+    public HashMap<String,User> get_all_users(){ return users;}
+
     public User get_user(String name) throws NoSuchUserException {
         User u = users.get(name);
         if (u == null) {

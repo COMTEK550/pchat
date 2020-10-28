@@ -1,8 +1,10 @@
+import java.security.PublicKey;
+
 public class User {
     public String name;
-    public String pkey;
+    public PublicKey pkey;
 
-    public User(String name,String pkey) {
+    public User(String name, PublicKey pkey) {
         this.name = name;
         this.pkey = pkey;
     }
