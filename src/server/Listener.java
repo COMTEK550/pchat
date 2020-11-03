@@ -1,6 +1,9 @@
+import jdk.jshell.spi.ExecutionControl;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Listener {
@@ -25,10 +28,11 @@ public class Listener {
     }
 
     public void register_client(SocketHandler h, String username) {
+        h.me = username;
         this.sockets.put(username, h);
     }
 
-    public void unregister_client(User user) {
+    public void unregister_client(String user) {
         this.sockets.remove(user);
     }
 
@@ -47,6 +51,9 @@ public class Listener {
             // Text message, redirect to conversation
             TextMessage tmsg = (TextMessage) msg;
             Conversation conv = this.store.get_conversation(tmsg.conversation);
+            if (!conv.has_user(sock.me)) {
+                throw new NotInChannelException();
+            }
             conv.send_here(this, tmsg);
         }
         else if(msg.getClass() == RegisterMessage.class){
@@ -67,12 +74,20 @@ public class Listener {
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
 
+            boolean has_user = false;
+            for (String user : cmsg.users) {
+                has_user = has_user || user.equals(sock.me);
+            }
+
+            if (!has_user) {
+                throw new NotInChannelException();
+            }
+
             cmsg.id = this.store.register_conversation(cmsg);
             System.out.printf("Created conversation with id %d%n", cmsg.id);
 
             for (String user : cmsg.users) {
                 this.send_to_user(cmsg, user);
-
             }
         }
     }
@@ -81,7 +96,7 @@ public class Listener {
 class SocketHandler extends Thread implements MessageSender {
     private Socket conn;
     private Listener listener;
-    public User me;
+    public String me;
     private ObjectOutputStream out;
 
     public SocketHandler(Socket conn, Listener listener) {
@@ -119,9 +134,15 @@ class SocketHandler extends Thread implements MessageSender {
 
     public void send(Message msg) throws IOException {
         if (this.me != null) {
-            System.out.printf("Sending message to %s%n", this.me.name);
+            System.out.printf("Sending message to %s%n", this.me);
         }
 
         this.out.writeObject(msg);
+    }
+}
+
+class NotInChannelException extends ClientException {
+    public NotInChannelException() {
+        super("Not in channel");
     }
 }
