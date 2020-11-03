@@ -1,5 +1,5 @@
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import javax.crypto.Cipher;
 
 public class TextMessage extends Message implements Serializable {
     public byte[] msg;
@@ -10,11 +10,8 @@ public class TextMessage extends Message implements Serializable {
         this.conversation = conversation;
     }
 
-    public String toString() {
-        try {
-            return new String(this.msg, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    return null;}
+    public String decrypt(Cipher cipher) throws Exception {
+        byte[] dec = cipher.doFinal(this.msg);
+        return new String(dec);
+    }
 }

@@ -1,14 +1,18 @@
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.net.*;
-import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.util.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
 
 
 public class Main {
@@ -22,7 +26,13 @@ public class Main {
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
 
-        Client client = new Client();
+        Client client = null;
+        try {
+            client = new Client();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         client.connect(hostName, portNumber);
     }
@@ -33,9 +43,18 @@ class Client {
     private int selected;
     private PublicKey pkey;
     private String user;
-    private HashMap<Integer,byte[]> conv_keys = new HashMap<>();
-    private HashMap<String,PublicKey> users = new HashMap<>();
+    private HashMap<Integer,byte[]> conv_keys;
+    private HashMap<String, PublicKey> users;
     private int randomNumber;
+    private SecretKeyFactory keyFactory;
+
+    public Client() throws Exception {
+        this.conv_keys = new HashMap<>();
+        this.users = new HashMap<>();
+
+        this.keyFactory = SecretKeyFactory.getInstance("DES");
+    }
+
     public void connect(String hostName, int portNumber) {
         ObjectOutputStream out;
         try{
@@ -125,18 +144,21 @@ class Client {
     }
 
     public void sent_text(String msg, ObjectOutputStream out,int conv_id) throws Exception {
+        DESKeySpec keyspec = new DESKeySpec(this.conv_keys.get(conv_id));
+        SecretKey key = this.keyFactory.generateSecret(keyspec);
 
-        SecretKey secretKey = new SecretKeySpec(this.conv_keys.get(conv_id), "DESede");
+        Cipher cipher = Cipher.getInstance("DES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+
         byte[] plainTextByte = msg.getBytes("UTF8");
-        byte[] encryptedBytes = SymmetricEncryption.encrypt(plainTextByte, secretKey);
-        TextMessage message = new TextMessage(encryptedBytes,conv_id);
+        byte[] encryptedBytes = cipher.doFinal(plainTextByte);
+
+        TextMessage message = new TextMessage(encryptedBytes, conv_id);
         try {
             out.writeObject(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void handle_msg(Message msg) throws Exception{
@@ -144,10 +166,14 @@ class Client {
         if(msg.getClass()==TextMessage.class){
 
             TextMessage tmsg = (TextMessage) msg;
-            SecretKey secretKey = new SecretKeySpec(this.conv_keys.get(tmsg.conversation), "DESede");
-            byte[] decryptedBytes = SymmetricEncryption.decrypt(tmsg.msg, secretKey);
-            String decryptedText = new String(decryptedBytes, "UTF8");
-            System.out.println(decryptedText);
+
+            DESKeySpec keyspec = new DESKeySpec(this.conv_keys.get(tmsg.conversation));
+            SecretKey key = this.keyFactory.generateSecret(keyspec);
+
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+
+            System.out.println(tmsg.decrypt(cipher));
         } else if(msg.getClass() == ErrorMessage.class) {
             ErrorMessage emsg = (ErrorMessage) msg;
             System.out.printf("Server err: %s%n", emsg);
