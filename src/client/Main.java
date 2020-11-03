@@ -8,10 +8,7 @@ import java.io.*;
 import java.net.*;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
+import java.util.*;
 
 
 public class Main {
@@ -38,6 +35,7 @@ class Client {
     private String user;
     private HashMap<Integer,byte[]> conv_keys = new HashMap<>();
     private HashMap<String,PublicKey> users = new HashMap<>();
+    private int randomNumber;
     public void connect(String hostName, int portNumber) {
         ObjectOutputStream out;
         try{
@@ -47,7 +45,8 @@ class Client {
 
         BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
 
-
+        Random random = new Random();
+        this.randomNumber = random.nextInt(9999);
         generate_keys();
 
         System.out.println("give username");
@@ -70,13 +69,13 @@ class Client {
                 String[] member_split = members.split(",");
                 ConversationMessage cmsg = new ConversationMessage(member_split);
                 AsymmetricEncryption enc = new AsymmetricEncryption();
-                for(int i=0;i<member_split.length;i++){
-                    cmsg.keys.put(member_split[i],enc.encryptText("hejmeddig",this.users.get(member_split[i])));
+                for (String s : member_split) {
+                    cmsg.keys.put(s, enc.encryptText("hejmeddig", this.users.get(s)));
                 }
                 out.writeObject(cmsg);
             } else if(message.startsWith("-listc")){
                  for(int i=0;i<this.conversations.size();i++){
-                     System.out.println(Arrays.toString(this.conversations.get(i)));
+                     System.out.println(Arrays.toString(this.conversations.get(i))+" with id: "+i);
                  }
             } else if(message.startsWith("-select")) {
                 String idstr = message.split(" ")[1];
@@ -117,24 +116,19 @@ class Client {
         try {
             gk = new GenerateKeys(1024);
             gk.createKeys();
+            gk.writeToFile("KeyPair/publicKey"+this.randomNumber, gk.getPublicKey().getEncoded());
+            gk.writeToFile("KeyPair/privateKey"+this.randomNumber, gk.getPrivateKey().getEncoded());
             this.pkey = gk.getPublicKey();
-            gk.writeToFile("KeyPair/publicKey", gk.getPublicKey().getEncoded());
-            gk.writeToFile("KeyPair/privateKey", gk.getPrivateKey().getEncoded());
         } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {
             System.err.println(e.getMessage());
         }
     }
 
     public void sent_text(String msg, ObjectOutputStream out,int conv_id) throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("DESede");
 
-        SymmetricEncryption symEnc = new SymmetricEncryption();
-        keyGenerator.init(168);
-        SecretKey secretKey = keyGenerator.generateKey();
-        Cipher cipher = Cipher.getInstance("DESede");
+        SecretKey secretKey = new SecretKeySpec(this.conv_keys.get(conv_id), "DESede");
         byte[] plainTextByte = msg.getBytes("UTF8");
-        byte[] encryptedBytes = symEnc.encrypt(plainTextByte, secretKey);
-
+        byte[] encryptedBytes = SymmetricEncryption.encrypt(plainTextByte, secretKey);
         TextMessage message = new TextMessage(encryptedBytes,conv_id);
         try {
             out.writeObject(message);
@@ -162,7 +156,7 @@ class Client {
             this.conversations.put(cmsg.id, cmsg.users);
             AsymmetricEncryption asEnc = new AsymmetricEncryption();
 
-            byte[] key = asEnc.decryptText(cmsg.keys.get(this.user),asEnc.getPrivate("KeyPair/privateKey")).getBytes();
+            byte[] key = asEnc.decryptText(cmsg.keys.get(this.user),asEnc.getPrivate("KeyPair/privateKey"+this.randomNumber)).getBytes();
             this.conv_keys.put(cmsg.id, key);
 
             System.out.printf("Joined conversation %d with %s%n", cmsg.id, Arrays.toString(cmsg.users));
