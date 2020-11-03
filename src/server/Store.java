@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Store {
     private ArrayList<Conversation> conversations;
 
-    private HashMap<String, User> users;
+    public HashMap<String, User> users;
 
     public Store() {
 
@@ -35,9 +35,13 @@ public class Store {
     public void remove_user(User user){
         this.users.remove(user.name);
     }
+    public void send_back_users(MessageSender out) throws IOException{
+        for(User user : this.users.values() ){
+            RegisterMessage out_rmsg = new RegisterMessage(user.pkey,user.name);
 
-    public void add_to_conversation(User user, Conversation conv){
+            out.send(out_rmsg);
 
+        }
     }
 
     public Conversation get_conversation(int id) throws NoSuchConversationException {

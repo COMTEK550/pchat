@@ -60,31 +60,31 @@ public class Listener {
             RegisterMessage rmsg = (RegisterMessage) msg;
             System.out.printf("Got public key from %s: %s%n", rmsg.name, rmsg.key);
             User u;
-
             if(this.store.check(rmsg.name)) {
                 u = this.store.get_user(rmsg.name);
-
                 this.store.replay_msg_for_user(sock, u);
-
             } else {
                 u = new User(rmsg.name, rmsg.key);
                 this.store.add_user(u);
-
+                for(SocketHandler s : this.sockets.values()){
+                    s.send(rmsg);
+                }
             }
-            register_client(sock, u.name);
+            this.store.send_back_users(sock);
+            this.register_client(sock, u.name);
+
+
+
 
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
-
             boolean has_user = false;
             for (String user : cmsg.users) {
                 has_user = has_user || user.equals(sock.me);
             }
-
             if (!has_user) {
                 throw new NotInChannelException();
             }
-
             cmsg.id = this.store.register_conversation(cmsg);
             System.out.printf("Created conversation with id %d%n", cmsg.id);
 

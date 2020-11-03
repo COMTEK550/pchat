@@ -101,9 +101,8 @@ class Client {
                 this.selected = Integer.parseInt(idstr);
 
             } else if(message.startsWith("-users")){
-                for(int i=0;i<this.users.size();i++){
                     System.out.println(this.users.keySet());
-                }
+
             } else {
                 int conv_id;
                 try {
