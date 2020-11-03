@@ -60,7 +60,7 @@ public class Store {
             }
         }
 
-        Conversation conv = new Conversation(cmsg.users);
+        Conversation conv = new Conversation(cmsg);
         conversations.add(conv);
         return conversations.size() - 1;
     }
@@ -70,9 +70,7 @@ public class Store {
         for (int i = 0; i < this.conversations.size(); i++) {
             Conversation conv = this.conversations.get(i);
             if (conv.has_user(user.name)) {
-                ConversationMessage cmsg = new ConversationMessage(conv.get_users());
-                cmsg.id = i;
-                out.send(cmsg);
+                conv.replay_init(out);
 
                 conv.replay(out);
             }

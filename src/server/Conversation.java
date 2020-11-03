@@ -6,14 +6,20 @@ import java.util.HashSet;
 public class Conversation {
     private ArrayList<Message> msgs;
     private HashSet<String> users;
+    private ConversationMessage cmsg;
 
-    public Conversation(String[] users) {
+    public Conversation(ConversationMessage cmsg) {
         this.msgs = new ArrayList<>();
         this.users = new HashSet<>();
+        this.cmsg = cmsg;
 
-        for (String user : users) {
+        for (String user : cmsg.users) {
             this.users.add(user);
         }
+    }
+
+    public void replay_init(MessageSender out) throws IOException {
+        out.send(this.cmsg);
     }
 
     public void send_here(Listener listener, TextMessage msg) throws IOException {
