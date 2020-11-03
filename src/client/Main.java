@@ -17,7 +17,6 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-
         if (args.length != 2) {
             System.err.println(
                     "Usage: java EchoClient <host name> <port number>");
@@ -35,6 +34,14 @@ public class Main {
         }
 
         client.connect(hostName, portNumber);
+        /*
+        Hello.Do("Client");
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new rootGUI().setVisible(true);
+            }
+        });
+        */
     }
 
 }
