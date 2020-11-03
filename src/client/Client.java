@@ -15,7 +15,6 @@ import java.util.Random;
 public class Client extends Thread {
     private HashMap<Integer, String[]> conversations = new HashMap<>();
     private int selected;
-    private PublicKey pkey;
     private String user;
     private String hostName;
     private int portNumber;
@@ -26,6 +25,7 @@ public class Client extends Thread {
     private Frontend frontend;
     private ObjectOutputStream out;
 
+    private KeyManager km;
 
     public Client(Frontend f) throws Exception {
         this.conv_keys = new HashMap<>();
@@ -34,12 +34,13 @@ public class Client extends Thread {
         this.keyFactory = SecretKeyFactory.getInstance("DES");
     }
 
-    public void connect(String hostName, int portNumber, String username) {
+    public void connect(String hostName, int portNumber, String username, KeyManager km) {
         this.hostName = hostName;
         this.portNumber = portNumber;
         this.user = username;
         this.start();
 
+        this.km = km;
     }
     public void run(){
         Hello.Do("Client");
@@ -54,11 +55,10 @@ public class Client extends Thread {
 
             Random random = new Random();
             this.randomNumber = random.nextInt(9999);
-            generate_keys();
 
             System.out.println("give username");
 
-            RegisterMessage rmsg = new RegisterMessage(this.pkey, this.user);
+            RegisterMessage rmsg = new RegisterMessage(this.km.getPublicKey(), this.user);
 
             //START INPUT
             MessageRecieved msgRecieved = new MessageRecieved(echoSocket, this);
@@ -108,20 +108,8 @@ public class Client extends Thread {
         } catch (
                 Exception e) {
             System.err.printf("fejl: %s%n", e);
+            e.printStackTrace();
             System.exit(1);
-        }
-    }
-
-    private void generate_keys() {
-        GenerateKeys gk;
-        try {
-            gk = new GenerateKeys(1024);
-            gk.createKeys();
-            gk.writeToFile("KeyPair/publicKey" + this.randomNumber, gk.getPublicKey().getEncoded());
-            gk.writeToFile("KeyPair/privateKey" + this.randomNumber, gk.getPrivateKey().getEncoded());
-            this.pkey = gk.getPublicKey();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {
-            System.err.println(e.getMessage());
         }
     }
 
@@ -174,7 +162,7 @@ public class Client extends Thread {
             this.conversations.put(cmsg.id, cmsg.users);
             AsymmetricEncryption asEnc = new AsymmetricEncryption();
 
-            byte[] key = asEnc.decryptText(cmsg.keys.get(this.user), asEnc.getPrivate("KeyPair/privateKey" + this.randomNumber)).getBytes();
+            byte[] key = asEnc.decryptText(cmsg.keys.get(this.user), this.km.getPrivateKey()).getBytes();
             this.conv_keys.put(cmsg.id, key);
 
             this.frontend.newConMsg(cmsg.id, cmsg.users);

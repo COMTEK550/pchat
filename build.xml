@@ -45,11 +45,11 @@
 
     <target name="compile" depends="init">
         <!-- Compile the Java code from ${src} into ${build} -->
-        <javac destdir="${build}/server">
+        <javac destdir="${build}/server" debug="true">
             <src path="${src}/server"/>
             <src path="${src}/shared"/>
         </javac>
-        <javac destdir="${build}/client">
+        <javac destdir="${build}/client" debug="true">
             <src path="${src}/client"/>
             <src path="${src}/shared"/>
         </javac>

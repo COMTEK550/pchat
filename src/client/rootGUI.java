@@ -5,6 +5,8 @@
  */
 
 import javax.swing.*;
+import java.io.File;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,12 +202,13 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
                 /* Create and display the form */
-        System.out.println(this.UsernameTextField.getText());
+        String name = this.UsernameTextField.getText();
 
-        this.client.connect("localhost", 6969, this.UsernameTextField.getText());
-        /*
+        SecureRandom rnd = new SecureRandom();
+        KeyManager km = new KeyManager();
+        km.save_or_load(name, rnd);
 
-        */
+        this.client.connect("localhost", 6969, name, km);
     }//GEN-LAST:event_connectButtonActionPerformed
 
     private void UsernameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernameTextFieldActionPerformed
@@ -267,7 +270,8 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         }
         //</editor-fold>
 
-
+        KeyManager km = new KeyManager();
+        String keyname = "coolkey";
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
