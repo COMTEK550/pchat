@@ -20,8 +20,6 @@ public class Store {
        return users.containsKey(name);
     }
 
-    public HashMap<String,User> get_all_users(){ return users;}
-
     public User get_user(String name) throws NoSuchUserException {
         User u = users.get(name);
         if (u == null) {
@@ -63,7 +61,7 @@ public class Store {
         return conversations.size() - 1;
     }
 
-    public void replay_all_for_user(MessageSender out, User user) throws IOException {
+    public void replay_msg_for_user(MessageSender out, User user) throws IOException {
         // Not efficient, should probably have a map with users and conversations
         for (int i = 0; i < this.conversations.size(); i++) {
             Conversation conv = this.conversations.get(i);
