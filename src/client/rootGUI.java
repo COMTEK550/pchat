@@ -4,19 +4,22 @@
  * and open the template in the editor.
  */
 
-/**
- *
- * @author vdot0x23
- */
-public class rootGUI extends javax.swing.JFrame {
+import java.awt.event.ActionListener;
 
+
+
+public class rootGUI extends javax.swing.JFrame implements Frontend{
+    private Client client;
     /**
      * Creates new form rootGUI
      */
-    public rootGUI() {
+    public rootGUI() throws Exception {
+        this.client = new Client(this);
         initComponents();
     }
-
+    public void newTxtMsg(String msg, int conv){
+        System.out.println(msg + "Fra ROOTGUI");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -66,7 +69,7 @@ public class rootGUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTextArea2);
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4" };
+            String[] strings = { "Item 1", "Virk 2"};
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -97,7 +100,7 @@ public class rootGUI extends javax.swing.JFrame {
         jTextArea3.setRows(5);
         jScrollPane5.setViewportView(jTextArea3);
 
-        UsernameTextField.setEditable(false);
+        UsernameTextField.setEditable(true);
         UsernameTextField.setText("Username");
         UsernameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -164,12 +167,9 @@ public class rootGUI extends javax.swing.JFrame {
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
                 /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ConnectForm().setVisible(true);
-            }
-        });
-        
+        System.out.println(this.UsernameTextField.getText());
+
+        this.client.connect("localhost", 6969, this.UsernameTextField.getText());
         /*
         
         */
@@ -177,6 +177,7 @@ public class rootGUI extends javax.swing.JFrame {
 
     private void UsernameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernameTextFieldActionPerformed
         // TODO add your handling code here:
+
     }//GEN-LAST:event_UsernameTextFieldActionPerformed
 
     private void FilenameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FilenameTextFieldActionPerformed
@@ -200,7 +201,8 @@ public class rootGUI extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -224,10 +226,16 @@ public class rootGUI extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new rootGUI().setVisible(true);
+                try {
+                    new rootGUI().setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
