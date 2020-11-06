@@ -32,6 +32,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         this.convList.addConv(id, name);
     }
 
+    public void newErrMsg(String msg) {
+        JOptionPane.showMessageDialog(this, String.format("Server error: %s", msg));
+    }
+
     public void newRegMsg(String name){
         userList.addElement(name);
     }
@@ -269,9 +273,6 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
             java.util.logging.Logger.getLogger(rootGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        KeyManager km = new KeyManager();
-        String keyname = "coolkey";
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

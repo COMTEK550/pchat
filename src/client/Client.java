@@ -157,6 +157,7 @@ public class Client extends Thread {
         } else if (msg.getClass() == ErrorMessage.class) {
             ErrorMessage emsg = (ErrorMessage) msg;
             System.out.printf("Server err: %s%n", emsg);
+            this.frontend.newErrMsg(emsg.toString());
         } else if (msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
             this.conversations.put(cmsg.id, cmsg.users);
