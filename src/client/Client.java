@@ -24,6 +24,7 @@ public class Client extends Thread {
     private int randomNumber;
     private SecretKeyFactory keyFactory;
     private Frontend frontend;
+    private ObjectOutputStream out;
 
 
     public Client(Frontend f) throws Exception {
@@ -43,7 +44,7 @@ public class Client extends Thread {
     public void run(){
         Hello.Do("Client");
 
-        ObjectOutputStream out;
+
         try {
             Socket echoSocket = new Socket(hostName, portNumber);
 
@@ -64,7 +65,7 @@ public class Client extends Thread {
             msgRecieved.start();
 
             //START OUTPUT
-            out = new ObjectOutputStream(echoSocket.getOutputStream());
+            this.out = new ObjectOutputStream(echoSocket.getOutputStream());
             out.writeObject(rmsg);
 
             while (true) {
@@ -140,6 +141,15 @@ public class Client extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void newConversation(String[] users) throws Exception{
+        ConversationMessage cmsg = new ConversationMessage(users);
+        AsymmetricEncryption enc = new AsymmetricEncryption();
+        for (String s : users) {
+            cmsg.keys.put(s, enc.encryptText("hejmeddig", this.users.get(s)));
+        }
+        out.writeObject(cmsg);
     }
 
     public void handle_msg(Message msg) throws Exception {

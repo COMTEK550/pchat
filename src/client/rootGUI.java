@@ -6,6 +6,7 @@
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class rootGUI extends javax.swing.JFrame implements Frontend{
@@ -49,14 +50,14 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         jOptionPane1 = new javax.swing.JOptionPane();
         connectButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        sendButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jChatHistory = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         jConvField = new javax.swing.JList<>();
         jUserField = new javax.swing.JList<>();
         FilenameTextField = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        newConvButton = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         jChatField = new javax.swing.JTextArea();
         UsernameTextField = new javax.swing.JTextField();
@@ -75,7 +76,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
             }
         });
 
-        jButton1.setText("Send");
+        sendButton.setText("Send");
 
         jChatHistory.setEditable(false);
         jChatHistory.setColumns(20);
@@ -86,6 +87,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         this.userList = new DefaultListModel<>();
         jUserField.setModel(this.userList);
         jScrollPane5.setViewportView(jUserField);
+
+        jUserField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+
 
         this.convList = new ConversationListModel();
         jConvField.setModel(this.convList);
@@ -111,8 +116,8 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
             }
         });
 
-        jButton2.setText("New Conversation");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        newConvButton.setText("New Conversation");
+        newConvButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
@@ -151,10 +156,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                                 .addComponent(FilenameTextField)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(sendButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane4)
                     .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(newConvButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap()
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane5))
@@ -170,7 +175,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2))
+                        .addComponent(newConvButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(FilenameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -182,7 +187,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jChatField, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE))
+                    .addComponent(sendButton, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE))
                 .addContainerGap())
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane5))
@@ -223,7 +228,15 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         this.jChatHistory.setText(this.convList.getTxtForConv(selIndex));
     }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-
+        //New ConversationButton
+        List<String> usersList = this.jUserField.getSelectedValuesList();
+        String[] users = new String[usersList.size()];
+        usersList.toArray(users);
+        try {
+            this.client.newConversation(users);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -272,8 +285,8 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
     private javax.swing.JTextField FilenameTextField;
     private javax.swing.JTextField UsernameTextField;
     private javax.swing.JButton connectButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton sendButton;
+    private javax.swing.JButton newConvButton;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
