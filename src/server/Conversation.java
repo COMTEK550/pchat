@@ -22,7 +22,7 @@ public class Conversation {
         out.send(this.cmsg);
     }
 
-    public void send_here(Listener listener, TextMessage msg) throws IOException {
+    public synchronized void send_here(Listener listener, TextMessage msg) throws IOException {
         System.out.printf("Sending message to conversation: %s%n", msg.toString());
         msgs.add(msg);
 

@@ -3,17 +3,16 @@ import jdk.jshell.spi.ExecutionControl;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Listener {
     private int port;
-    private HashMap<String, SocketHandler> sockets;
+    private ConcurrentHashMap<String, SocketHandler> sockets;
     private Store store;
 
     public Listener(int port, Store store) {
         this.port = port;
-        this.sockets = new HashMap<>();
+        this.sockets = new ConcurrentHashMap<>();
         this.store = store;
     }
 

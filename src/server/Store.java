@@ -4,18 +4,20 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 public class Store {
     private ArrayList<Conversation> conversations;
 
-    public HashMap<String, User> users;
+    private ConcurrentHashMap<String, User> users;
 
     public Store() {
 
         this.conversations = new ArrayList<>();
-        this.users = new HashMap<>();
+        this.users = new ConcurrentHashMap<>();
     }
+
     public boolean check(String name){
        return users.containsKey(name);
     }
@@ -52,7 +54,7 @@ public class Store {
         }
     }
 
-    public int register_conversation(ConversationMessage cmsg) throws Exception {
+    public synchronized int register_conversation(ConversationMessage cmsg) throws Exception {
         // Check if users exist
         for (String user : cmsg.users) {
             if (!this.check(user)) {
