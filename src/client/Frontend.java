@@ -3,7 +3,7 @@ public interface Frontend {
 
     //public void newErrMsg(String msg);
 
-    //public void newConMsg(int id, String[] users);
+    public void newConMsg(int id, String[] users);
 
     //public void newRegMsg(String name);
 }

@@ -42,15 +42,6 @@ public class Client extends Thread {
     }
     public void run(){
         Hello.Do("Client");
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new rootGUI().setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
         ObjectOutputStream out;
         try {
@@ -176,9 +167,7 @@ public class Client extends Thread {
             byte[] key = asEnc.decryptText(cmsg.keys.get(this.user), asEnc.getPrivate("KeyPair/privateKey" + this.randomNumber)).getBytes();
             this.conv_keys.put(cmsg.id, key);
 
-            System.out.printf("Joined conversation %d with %s%n", cmsg.id, Arrays.toString(cmsg.users));
-            String shhhSecret = new String(key, "UTF-8");
-            System.out.println(shhhSecret);
+            this.frontend.newConMsg(cmsg.id, cmsg.users);
         } else if (msg.getClass() == RegisterMessage.class) {
             RegisterMessage rmsg = (RegisterMessage) msg;
             this.users.put(rmsg.name, rmsg.key);

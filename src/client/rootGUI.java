@@ -4,12 +4,13 @@
  * and open the template in the editor.
  */
 
-import java.awt.event.ActionListener;
-
+import javax.swing.*;
+import java.util.ArrayList;
 
 
 public class rootGUI extends javax.swing.JFrame implements Frontend{
     private Client client;
+    private ConversationListModel convList;
     /**
      * Creates new form rootGUI
      */
@@ -20,6 +21,12 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
     public void newTxtMsg(String msg, int conv){
         System.out.println(msg + "Fra ROOTGUI");
     }
+
+    public void newConMsg(int id, String[] users){
+        String name = String.join(",", users);
+        this.convList.addConv(id, name);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,13 +45,13 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        jChatHistory = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        jConvField = new javax.swing.JList<>();
         FilenameTextField = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
-        jTextArea3 = new javax.swing.JTextArea();
+        jChatField = new javax.swing.JTextArea();
         UsernameTextField = new javax.swing.JTextField();
 
         jLabel1.setText("jLabel1");
@@ -54,7 +61,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Friland Chat");
 
-        connectButton.setText("Connect...");
+        connectButton.setText("Connect");
         connectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 connectButtonActionPerformed(evt);
@@ -63,21 +70,25 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
 
         jButton1.setText("Send");
 
-        jTextArea2.setEditable(false);
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        jChatHistory.setEditable(false);
+        jChatHistory.setColumns(20);
+        jChatHistory.setRows(5);
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Virk 2"};
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        jScrollPane2.setViewportView(jChatHistory);
+
+        this.convList = new ConversationListModel();
+        jConvField.setModel(this.convList);
+
+        jConvField.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jConvField.addListSelectionListener(new javax.swing.event.ListSelectionListener(){
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt){
+                SelectedConversationListener(evt);
+            }
         });
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane4.setViewportView(jList1);
+        jScrollPane4.setViewportView(jConvField);
 
         FilenameTextField.setEditable(false);
-        FilenameTextField.setText("Filename");
+        FilenameTextField.setText("Server IP");
         FilenameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 FilenameTextFieldFocusGained(evt);
@@ -89,16 +100,17 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
             }
         });
 
-        jButton2.setText("New...");
+        jButton2.setText("New Conversation");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jTextArea3.setColumns(20);
-        jTextArea3.setRows(5);
-        jScrollPane5.setViewportView(jTextArea3);
+        jChatField.setColumns(20);
+        jChatField.setRows(5);
+        jChatField.setText("Hej julian");
+        jChatField.setEditable(true);
 
         UsernameTextField.setEditable(true);
         UsernameTextField.setText("Username");
@@ -121,7 +133,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jChatField, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(UsernameTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -155,7 +167,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                         .addComponent(jScrollPane2)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jChatField, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -190,6 +202,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
 
     }//GEN-LAST:event_FilenameTextFieldFocusGained
 
+    private void SelectedConversationListener(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_FilenameTextFieldFocusGained
+        int selIndex = this.jConvField.getSelectedIndex();
+        this.jChatHistory.setText(this.convList.getTxtForConv(selIndex));
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -250,13 +266,42 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JList<String> jConvField;
     private javax.swing.JOptionPane jOptionPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTextArea jChatHistory;
+    private javax.swing.JTextArea jChatField;
     // End of variables declaration//GEN-END:variables
+}
+
+class ConversationListModel extends AbstractListModel{
+
+    private ArrayList<String> convs;
+
+    public ConversationListModel(){
+        this.convs = new ArrayList<>();
+    }
+
+    @Override
+    public int getSize() {
+        return this.convs.size();
+    }
+
+    @Override
+    public Object getElementAt(int index) {
+        return this.convs.get(index);
+    }
+
+    public void addConv(int id, String name){
+        int s = this.convs.size();
+        this.convs.add(name);
+        this.fireIntervalAdded(this, s, s);
+    }
+    public String getTxtForConv(int index){
+        return "Hej med dig" + this.convs.get(index);
+    }
+
 }
