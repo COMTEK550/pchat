@@ -5,5 +5,5 @@ public interface Frontend {
 
     public void newConMsg(int id, String[] users);
 
-    //public void newRegMsg(String name);
+    public void newRegMsg(String name);
 }

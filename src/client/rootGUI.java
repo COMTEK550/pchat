@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class rootGUI extends javax.swing.JFrame implements Frontend{
     private Client client;
     private ConversationListModel convList;
+    private javax.swing.JList<String> jUserField;
+    private DefaultListModel<String> userList;
     /**
      * Creates new form rootGUI
      */
@@ -25,6 +27,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
     public void newConMsg(int id, String[] users){
         String name = String.join(",", users);
         this.convList.addConv(id, name);
+    }
+
+    public void newRegMsg(String name){
+        userList.addElement(name);
     }
 
     /**
@@ -48,6 +54,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         jChatHistory = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         jConvField = new javax.swing.JList<>();
+        jUserField = new javax.swing.JList<>();
         FilenameTextField = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
@@ -75,6 +82,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         jChatHistory.setRows(5);
 
         jScrollPane2.setViewportView(jChatHistory);
+
+        this.userList = new DefaultListModel<>();
+        jUserField.setModel(this.userList);
+        jScrollPane5.setViewportView(jUserField);
 
         this.convList = new ConversationListModel();
         jConvField.setModel(this.convList);
@@ -144,7 +155,10 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                     .addComponent(jScrollPane4)
                     .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addContainerGap()
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane5))
+            )
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,6 +184,8 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
                     .addComponent(jChatField, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE))
                 .addContainerGap())
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane5))
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {FilenameTextField, UsernameTextField, connectButton});
@@ -183,7 +199,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
 
         this.client.connect("localhost", 6969, this.UsernameTextField.getText());
         /*
-        
+
         */
     }//GEN-LAST:event_connectButtonActionPerformed
 
@@ -207,11 +223,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         this.jChatHistory.setText(this.convList.getTxtForConv(selIndex));
     }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ChatForm().setVisible(true);
-            }
-        });
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -222,7 +234,7 @@ public class rootGUI extends javax.swing.JFrame implements Frontend{
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

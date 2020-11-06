@@ -171,7 +171,7 @@ public class Client extends Thread {
         } else if (msg.getClass() == RegisterMessage.class) {
             RegisterMessage rmsg = (RegisterMessage) msg;
             this.users.put(rmsg.name, rmsg.key);
-            System.out.printf("New user has been added to list %s with key: %s %n", rmsg.name, rmsg.key);
+            this.frontend.newRegMsg(rmsg.name);
         }
 
     }
