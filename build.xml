@@ -58,7 +58,7 @@
     <target name="dist" depends="compile">
         <jar basedir="${build}/client" jarfile="${dist}/client.jar">
             <manifest>
-                <attribute name="Main-Class" value="rootGUI"/>
+                <attribute name="Main-Class" value="RootGUI"/>
             </manifest>
         </jar>
         <jar basedir="${build}/server" jarfile="${dist}/server.jar">

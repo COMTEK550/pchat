@@ -56,8 +56,6 @@ public class Client extends Thread {
             Random random = new Random();
             this.randomNumber = random.nextInt(9999);
 
-            System.out.println("give username");
-
             RegisterMessage rmsg = new RegisterMessage(this.km.getPublicKey(), this.user);
 
             //START INPUT
@@ -91,9 +89,8 @@ public class Client extends Thread {
                     System.out.println(this.users.keySet());
 
                 } else {
-                    int conv_id;
                     try {
-                        sent_text(message, out, this.selected);
+                        sent_text(message, this.selected);
 
                     } catch (Exception e) {
                         System.out.printf("Forkert conversation id: %s %n", e);
@@ -113,7 +110,7 @@ public class Client extends Thread {
         }
     }
 
-    public void sent_text(String msg, ObjectOutputStream out, int conv_id) throws Exception {
+    public void sent_text(String msg, int conv_id) throws Exception {
         DESKeySpec keyspec = new DESKeySpec(this.conv_keys.get(conv_id));
         SecretKey key = this.keyFactory.generateSecret(keyspec);
 
@@ -143,7 +140,6 @@ public class Client extends Thread {
     public void handle_msg(Message msg) throws Exception {
 
         if (msg.getClass() == TextMessage.class) {
-
             TextMessage tmsg = (TextMessage) msg;
 
             DESKeySpec keyspec = new DESKeySpec(this.conv_keys.get(tmsg.conversation));
@@ -154,6 +150,7 @@ public class Client extends Thread {
 
 
             this.frontend.newTxtMsg(tmsg.decrypt(cipher), tmsg.conversation);
+
         } else if (msg.getClass() == ErrorMessage.class) {
             ErrorMessage emsg = (ErrorMessage) msg;
             System.out.printf("Server err: %s%n", emsg);
@@ -201,6 +198,7 @@ class MessageRecieved extends Thread {
             }
         }catch (Exception e) {
             System.out.printf("Failed to recieve: %s %n", e);
+            e.printStackTrace();
 
         }
     }

@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class RootGUI extends javax.swing.JFrame implements Frontend{
@@ -15,13 +16,38 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private ConversationListModel convList;
     private javax.swing.JList<String> jUserField;
     private DefaultListModel<String> userList;
+    private ConcurrentHashMap<Integer, ArrayList<String>> history;
 
     public RootGUI() throws Exception {
         this.client = new Client(this);
+        this.history = new ConcurrentHashMap<>();
         initComponents();
     }
     public void newTxtMsg(String msg, int conv){
-        System.out.println(msg + "Fra ROOTGUI");
+        System.out.println("Hej fra newTxtMsg");
+        ArrayList<String> messages = this.history.get(conv);
+        if(messages == null){
+            messages = new ArrayList<>();
+        }
+        messages.add(msg);
+        this.history.put(conv, messages);
+
+        int selIndex = this.jConvField.getSelectedIndex();
+        if(conv == this.convList.getSelectedConv(selIndex)){
+            printMsgs();
+        }
+    }
+
+    private void printMsgs(){
+        int selIndex = this.jConvField.getSelectedIndex();
+        int id = this.convList.getSelectedConv(selIndex);
+        this.jChatHistory.setText("");
+        if(this.history.get(id) == null){
+            return;
+        }
+        for(String message : this.history.get(id)){
+            this.jChatHistory.append(message + "\n");
+        }
     }
 
     public void newConMsg(int id, String[] users){
@@ -63,6 +89,12 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         });
 
         sendButton.setText("Send");
+        sendButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendButtonActionPerformed(evt);
+            }
+        });
+
 
         jChatHistory.setEditable(false);
         jChatHistory.setColumns(20);
@@ -99,9 +131,8 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
             }
         });
 
-        jChatField.setColumns(20);
+        jChatField.setColumns(10);
         jChatField.setRows(5);
-        jChatField.setText("Hej julian");
         jChatField.setEditable(true);
 
         UsernameTextField.setEditable(true);
@@ -178,9 +209,18 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         this.client.connect("localhost", 6969, name, km);
     }//GEN-LAST:event_connectButtonActionPerformed
 
-    private void SelectedConversationListener(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_FilenameTextFieldFocusGained
+    private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
         int selIndex = this.jConvField.getSelectedIndex();
-        this.jChatHistory.setText(this.convList.getTxtForConv(selIndex));
+        int id = this.convList.getSelectedConv(selIndex);
+        try {
+            this.client.sent_text(this.jChatField.getText(), id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void SelectedConversationListener(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_FilenameTextFieldFocusGained
+        printMsgs();
     }
     private void NewConversationButton(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         //New ConversationButton
@@ -237,10 +277,19 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private javax.swing.JTextArea jChatHistory;
     private javax.swing.JTextArea jChatField;
 }
+class ConversationMini{
+    public int id;
+    public String name;
+
+    public ConversationMini(int id, String name){
+        this.id = id;
+        this.name = name;
+    }
+}
 
 class ConversationListModel extends AbstractListModel<String> {
 
-    private ArrayList<String> convs;
+    private ArrayList<ConversationMini> convs;
 
     public ConversationListModel(){
         this.convs = new ArrayList<>();
@@ -253,16 +302,17 @@ class ConversationListModel extends AbstractListModel<String> {
 
     @Override
     public String getElementAt(int index) {
-        return this.convs.get(index);
+        return this.convs.get(index).name;
     }
 
     public void addConv(int id, String name){
         int s = this.convs.size();
-        this.convs.add(name);
+        this.convs.add(new ConversationMini(id, name));
         this.fireIntervalAdded(this, s, s);
     }
-    public String getTxtForConv(int index){
-        return "Hej med dig" + this.convs.get(index);
+    public int getSelectedConv(int index){
+        if (index < 0 || index >= this.convs.size()) {return -1;}
+        return this.convs.get(index).id;
     }
 
 }
