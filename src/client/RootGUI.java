@@ -238,7 +238,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private javax.swing.JTextArea jChatField;
 }
 
-class ConversationListModel extends AbstractListModel{
+class ConversationListModel extends AbstractListModel<String> {
 
     private ArrayList<String> convs;
 
@@ -252,7 +252,7 @@ class ConversationListModel extends AbstractListModel{
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public String getElementAt(int index) {
         return this.convs.get(index);
     }
 
