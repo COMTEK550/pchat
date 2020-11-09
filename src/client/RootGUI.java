@@ -60,6 +60,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     }
 
     public void newRegMsg(String name){
+        System.out.printf("New user %s%n", name);
         userList.addElement(name);
     }
 
@@ -72,7 +73,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         jConvScroll = new javax.swing.JScrollPane();
         jConvField = new javax.swing.JList<>();
         jUserField = new javax.swing.JList<>();
-        FilenameTextField = new javax.swing.JTextField();
+        ServerTextField = new javax.swing.JTextField();
         newConvButton = new javax.swing.JButton();
         jUserScroll = new javax.swing.JScrollPane();
         jChatField = new javax.swing.JTextArea();
@@ -121,8 +122,8 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         });
         jConvScroll.setViewportView(jConvField);
 
-        FilenameTextField.setEditable(false);
-        FilenameTextField.setText("Server IP");
+        ServerTextField.setEditable(true);
+        ServerTextField.setText("localhost");
 
         newConvButton.setText("New Conversation");
         newConvButton.addActionListener(new java.awt.event.ActionListener() {
@@ -154,7 +155,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(UsernameTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(FilenameTextField)))
+                                .addComponent(ServerTextField)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(sendButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -179,7 +180,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
                         .addComponent(newConvButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(FilenameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ServerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(UsernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -193,7 +194,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
                             .addComponent(jUserScroll))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {FilenameTextField, UsernameTextField, connectButton});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {ServerTextField, UsernameTextField, connectButton});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -201,12 +202,13 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
                 /* Create and display the form */
         String name = this.UsernameTextField.getText();
+        Destination dest = new Destination(this.ServerTextField.getText());
 
         SecureRandom rnd = new SecureRandom();
         KeyManager km = new KeyManager();
         km.save_or_load(name, rnd);
 
-        this.client.connect("localhost", 6969, name, km);
+        this.client.connect(dest.host, dest.port, name, km);
     }//GEN-LAST:event_connectButtonActionPerformed
 
     private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -265,7 +267,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         new RootGUI().setVisible(true);
     }
 
-    private javax.swing.JTextField FilenameTextField;
+    private javax.swing.JTextField ServerTextField;
     private javax.swing.JTextField UsernameTextField;
     private javax.swing.JButton connectButton;
     private javax.swing.JButton sendButton;
