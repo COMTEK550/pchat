@@ -127,6 +127,8 @@ class SocketHandler extends Thread implements MessageSender {
             // Client disconnected do nothing
             System.out.println("Client disconnected");
             this.listener.unregister_client(this.me);
+        } catch (IOException e) {
+            System.out.println("Client write error");
         } catch (Exception e) {
             System.out.printf("ERR: %s%n", e);
             e.printStackTrace();
