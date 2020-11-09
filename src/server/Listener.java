@@ -57,6 +57,9 @@ public class Listener {
         }
         else if(msg.getClass() == RegisterMessage.class){
             RegisterMessage rmsg = (RegisterMessage) msg;
+            if (rmsg.name.length() > 32) {
+                throw new ClientException("Username to long");
+            }
             System.out.printf("Got public key from %s: %s%n", rmsg.name, rmsg.key);
             User u;
             if(this.store.check(rmsg.name)) {

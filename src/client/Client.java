@@ -18,8 +18,6 @@ enum Status {
 public class Client extends Thread {
     private HashMap<Integer, String[]> conversations = new HashMap<>();
     private String user;
-    private String hostName;
-    private int portNumber;
     private HashMap<Integer, byte[]> conv_keys;
     private HashMap<String, PublicKey> users;
     private SecureRandom rnd;
@@ -27,6 +25,7 @@ public class Client extends Thread {
     private Frontend frontend;
     private ObjectOutputStream out;
     private Status status;
+    private MessageListener listener;
 
     private KeyManager km;
 
@@ -43,18 +42,14 @@ public class Client extends Thread {
         if (this.status == Status.CONNECTED) {
             throw new Exception("Already connected");
         }
-        this.hostName = hostName;
-        this.portNumber = portNumber;
         this.user = username;
         this.km = km;
         Socket echoSocket = new Socket(hostName, portNumber);
 
-        BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
-
         RegisterMessage rmsg = new RegisterMessage(this.km.getPublicKey(), this.user);
 
         //START INPUT
-        MessageListener listener = new MessageListener(echoSocket, this);
+        this.listener = new MessageListener(echoSocket, this);
         listener.start();
 
         //START OUTPUT
@@ -62,6 +57,13 @@ public class Client extends Thread {
         out.writeObject(rmsg);
 
         this.status = Status.CONNECTED;
+    }
+
+    public void disconnect() throws IOException {
+        this.out.flush();
+        this.out.close();
+        this.listener.stop();
+        this.status = Status.NOTCONNECTED;
     }
 
     public void sendTxtMsg(String msg, int conv_id) throws Exception {
@@ -128,6 +130,7 @@ public class Client extends Thread {
 class MessageListener extends Thread {
     private Socket sock;
     private  Client client;
+    private ObjectInputStream in;
     public MessageListener(Socket sock, Client client){
         try {
             this.sock = sock;
@@ -140,7 +143,7 @@ class MessageListener extends Thread {
 
     public void run(){
         try {
-            ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
+            in = new ObjectInputStream(sock.getInputStream());
             while(true) {
 
                 Message msg = (Message) in.readObject();
@@ -154,5 +157,9 @@ class MessageListener extends Thread {
 
         }
     }
+    public void close() throws IOException {
+        this.stop();
+        this.in.close();
+        this.sock.close();
+    }
 }
-
