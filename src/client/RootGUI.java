@@ -6,7 +6,10 @@
 
 import javax.swing.*;
 import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,19 +20,20 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private javax.swing.JList<String> jUserField;
     private DefaultListModel<String> userList;
     private ConcurrentHashMap<Integer, ArrayList<String>> history;
+    private DateFormat dateFormat;
 
     public RootGUI() throws Exception {
         this.client = new Client(this);
         this.history = new ConcurrentHashMap<>();
+        this.dateFormat = new SimpleDateFormat("MM-dd'T'HH:mm:ss");
         initComponents();
     }
-    public void newTxtMsg(String msg, int conv){
-        System.out.println("Hej fra newTxtMsg");
+    public void newTxtMsg(String msg, int conv, String user, Date stamp){
         ArrayList<String> messages = this.history.get(conv);
         if(messages == null){
             messages = new ArrayList<>();
         }
-        messages.add(msg);
+        messages.add(String.format("[%s:%s] %s", this.dateFormat.format(stamp), user, msg));
         this.history.put(conv, messages);
 
         int selIndex = this.jConvField.getSelectedIndex();

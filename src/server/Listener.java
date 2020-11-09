@@ -3,6 +3,7 @@ import jdk.jshell.spi.ExecutionControl;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Listener {
@@ -53,6 +54,11 @@ public class Listener {
             if (!conv.has_user(sock.me)) {
                 throw new NotInChannelException();
             }
+
+            // Add information to msg
+            tmsg.stamp = new Date();
+            tmsg.user = sock.me;
+
             conv.send_here(this, tmsg);
         }
         else if(msg.getClass() == RegisterMessage.class){

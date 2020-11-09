@@ -103,7 +103,7 @@ public class Client extends Thread {
             cipher.init(Cipher.DECRYPT_MODE, key);
 
 
-            this.frontend.newTxtMsg(tmsg.decrypt(cipher), tmsg.conversation);
+            this.frontend.newTxtMsg(tmsg.decrypt(cipher), tmsg.conversation, tmsg.user, tmsg.stamp);
 
         } else if (msg.getClass() == ErrorMessage.class) {
             ErrorMessage emsg = (ErrorMessage) msg;
