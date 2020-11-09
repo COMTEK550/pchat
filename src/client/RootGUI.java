@@ -64,19 +64,25 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     }
 
     public void newRegMsg(String name){
-        System.out.printf("New user %s%n", name);
-        userList.addElement(name);
+        DefaultListModel listmodel = this.userList;
+        System.out.printf("New user '%s'%n", name);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                listmodel.addElement(name);
+            }
+        });
     }
 
     private void initComponents() {
 
+        userList = new DefaultListModel<>();
         connectButton = new javax.swing.JButton();
         sendButton = new javax.swing.JButton();
         jChatHistoryScroll = new javax.swing.JScrollPane();
         jChatHistory = new javax.swing.JTextArea();
         jConvScroll = new javax.swing.JScrollPane();
         jConvField = new javax.swing.JList<>();
-        jUserField = new javax.swing.JList<>();
+        jUserField = new javax.swing.JList<>(userList);
         ServerTextField = new javax.swing.JTextField();
         newConvButton = new javax.swing.JButton();
         jUserScroll = new javax.swing.JScrollPane();
@@ -107,13 +113,9 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
 
         jChatHistoryScroll.setViewportView(jChatHistory);
 
-        this.userList = new DefaultListModel<>();
-        jUserField.setModel(this.userList);
         jUserScroll.setViewportView(jUserField);
 
         jUserField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-
 
         this.convList = new ConversationListModel();
         jConvField.setModel(this.convList);
@@ -168,7 +170,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
                     .addComponent(newConvButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap()
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jUserScroll))
+                            .addComponent(jUserScroll, 200, 200, Short.MAX_VALUE))
             )
         );
         layout.setVerticalGroup(

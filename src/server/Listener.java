@@ -81,9 +81,6 @@ public class Listener {
             this.store.send_back_users(sock);
             this.register_client(sock, u.name);
 
-
-
-
         } else if(msg.getClass() == ConversationMessage.class) {
             ConversationMessage cmsg = (ConversationMessage) msg;
             boolean has_user = false;
@@ -135,14 +132,13 @@ class SocketHandler extends Thread implements MessageSender {
         } catch (EOFException e) {
             // Client disconnected do nothing
             System.out.println("Client disconnected");
-            this.listener.unregister_client(this.me);
         } catch (IOException e) {
             System.out.println("Client write error");
-            this.listener.unregister_client(this.me);
         } catch (Exception e) {
             System.out.printf("ERR: %s%n", e);
             e.printStackTrace();
         }
+        this.listener.unregister_client(this.me);
     }
 
     public void send(Message msg) throws IOException {
