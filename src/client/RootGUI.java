@@ -208,16 +208,25 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
         KeyManager km = new KeyManager();
         km.save_or_load(name, rnd);
 
-        this.client.connect(dest.host, dest.port, name, km);
+        try {
+            this.client.connect(dest.host, dest.port, name, km);
+        } catch(Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e);
+        }
     }//GEN-LAST:event_connectButtonActionPerformed
 
     private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
         int selIndex = this.jConvField.getSelectedIndex();
         int id = this.convList.getSelectedConv(selIndex);
+        if (id < 0) {
+            return;
+        }
         try {
-            this.client.sent_text(this.jChatField.getText(), id);
+            this.client.sendTxtMsg(this.jChatField.getText(), id);
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e);
         }
     }
 
@@ -233,6 +242,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
             this.client.newConversation(users);
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
