@@ -23,7 +23,7 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private DateFormat dateFormat;
 
     public RootGUI() throws Exception {
-        this.client = new Client(this);
+        this.client = Client.getInstance(this);
         this.history = new ConcurrentHashMap<>();
         this.dateFormat = new SimpleDateFormat("MM-dd'T'HH:mm:ss");
         initComponents();
@@ -209,12 +209,12 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
                 /* Create and display the form */
         String name = this.UsernameTextField.getText();
         Destination dest = new Destination(this.ServerTextField.getText());
-
         SecureRandom rnd = new SecureRandom();
         KeyManager km = new KeyManager();
         km.save_or_load(name, rnd);
 
         try {
+
             this.client.connect(dest.host, dest.port, name, km);
         } catch(Exception e) {
             e.printStackTrace();

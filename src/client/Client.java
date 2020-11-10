@@ -15,7 +15,7 @@ enum Status {
     CONNECTED
 }
 
-public class Client extends Thread {
+public class Client {
     private HashMap<Integer, String[]> conversations = new HashMap<>();
     private String user;
     private HashMap<Integer, byte[]> conv_keys;
@@ -27,16 +27,27 @@ public class Client extends Thread {
     private Status status;
     private MessageListener listener;
 
+    private static Client client_instance = null;
+
     private KeyManager km;
 
-    public Client(Frontend f) throws Exception {
+    public Client() throws Exception {
         this.conv_keys = new HashMap<>();
         this.users = new HashMap<>();
-        this.frontend = f;
+
         this.keyFactory = SecretKeyFactory.getInstance("DES");
         this.rnd = new SecureRandom();
         this.status = Status.NOTCONNECTED;
     }
+    public static Client getInstance(Frontend f) throws Exception {
+        if (client_instance == null) {
+            client_instance = new Client();
+
+        }
+
+        client_instance.frontend = f;
+        return client_instance;
+        }
 
     public void connect(String hostName, int portNumber, String username, KeyManager km) throws Exception {
         if (this.status == Status.CONNECTED) {
@@ -62,7 +73,7 @@ public class Client extends Thread {
     public void disconnect() throws IOException {
         this.out.flush();
         this.out.close();
-        this.listener.stop();
+        this.listener.close();
         this.status = Status.NOTCONNECTED;
     }
 
@@ -131,6 +142,7 @@ class MessageListener extends Thread {
     private Socket sock;
     private  Client client;
     private ObjectInputStream in;
+
     public MessageListener(Socket sock, Client client){
         try {
             this.sock = sock;
@@ -159,6 +171,8 @@ class MessageListener extends Thread {
     }
     public void close() throws IOException {
         this.stop();
+
+
         this.in.close();
         this.sock.close();
     }
