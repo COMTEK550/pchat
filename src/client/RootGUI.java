@@ -23,6 +23,8 @@ public class RootGUI extends javax.swing.JFrame implements Frontend{
     private DateFormat dateFormat;
 
     public RootGUI() throws Exception {
+        new SongPlayer("song.wav");
+
         this.client = Client.getInstance(this);
         this.history = new ConcurrentHashMap<>();
         this.dateFormat = new SimpleDateFormat("MM-dd'T'HH:mm:ss");
