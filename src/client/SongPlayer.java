@@ -3,15 +3,23 @@ import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import javax.sound.sampled.*;
 
-public class SongPlayer {
+public class SongPlayer extends Thread {
+    private String fname;
     public SongPlayer(String fname) throws Exception {
-        InputStream in = getClass().getResourceAsStream(fname);
-        in = new BufferedInputStream(in);
+        this.fname = fname;
+    }
 
-        Clip clip = AudioSystem.getClip();
-        AudioInputStream ais = AudioSystem.getAudioInputStream(in);
-        clip.open(ais);
-        clip.start();
+    public void run() {
+        try {
+            InputStream in = getClass().getResourceAsStream(this.fname);
+            in = new BufferedInputStream(in);
 
+            Clip clip = AudioSystem.getClip();
+            AudioInputStream ais = AudioSystem.getAudioInputStream(in);
+            clip.open(ais);
+            clip.start();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 }
